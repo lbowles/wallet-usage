@@ -9,6 +9,7 @@
     "@web3modal/ethereum": "^2.0.0-beta.9",
     "@web3modal/react": "^2.0.0-beta.9",
     "autoprefixer": "^10.4.13",
+    "chart.js": "^4.0.1",
     "ethers": "^5.7.2",
     "postcss": "^8.4.20",
     "react": "^18.2.0",
