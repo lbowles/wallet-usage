@@ -49,7 +49,7 @@ function App() {
   }
 
   return (
-    <div className="bg-slate-900">
+    <div className="bg-slate-900 sm:px-0 px-5">
       <Web3Modal
         themeColor="purple"
         projectId="e38c7975262940ae960b8b2a7c841248"
@@ -63,8 +63,8 @@ function App() {
           </h1>
           <img src={logo}></img>
         </div>
-        <div className="flex flex-row justify-center space-x-4 pt-11">
-          <form className="group relative w-80">
+        <div className="flex flex-col-reverse sm:flex-row justify-center space-x-0 sm:space-x-4 pt-11">
+          <form className="group relative w-full sm:w-80 sm:pt-0 pt-4">
             <input
               className="bg-slate-800 focus:ring-2 focus:#794DFF focus:outline-none appearance-none w-full text-sm leading-6 text-white placeholder-slate-200 rounded-md py-2 pl-2 ring-1 ring-slate-700 shadow-sm disabled:bg-slate-700"
               type="text"
