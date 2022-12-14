@@ -49,7 +49,7 @@ var tempData = {
 
 let txByMonth = new Map()
 
-export default function ChartHistory({ transactions }) {
+export default function ChartHistory({ transactions, handleMonthUpdate }) {
   const [data, setData] = useState(tempData)
   // const [selectedMonth, setSelectedMonth] = useState()
 
@@ -110,7 +110,7 @@ export default function ChartHistory({ transactions }) {
     if (!element.length) return
     const { datasetIndex, index } = element[0]
     console.log(txByMonth.get(getMonthFromString(data.labels[index])))
-    // handleMonthUpdate(txByMonth.get(getMonthFromString(data.labels[index])))
+    handleMonthUpdate(txByMonth.get(getMonthFromString(data.labels[index])))
   }
 
   function getMonthFromString(mon) {

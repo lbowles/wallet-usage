@@ -41,8 +41,8 @@ function App() {
     }
   }, [isDisconnected, isConnecting])
 
-  const handleMonthUpdate = () => {
-    setSelectedMonth(selectedMonth)
+  const handleMonthUpdate = (value) => {
+    setSelectedMonth(value)
   }
 
   const getTxHistory = () => {
@@ -82,7 +82,10 @@ function App() {
           </form>
           <Web3Button />
         </div>
-        <Chart transactions={transactions} />
+        <Chart
+          transactions={transactions}
+          handleMonthUpdate={handleMonthUpdate}
+        />
         <DisplayTransactions selectedMonth={selectedMonth} />
         <button onClick={() => getTxHistory()}>get history</button>
       </WagmiConfig>
