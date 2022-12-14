@@ -58,10 +58,10 @@ function App() {
       {/* //TODO add ENS support */}
       <WagmiConfig client={wagmiClient}>
         <div className="flex justify-center space-x-4 pt-20 pb-10">
-          <h1 className="text-7xl subpixel-antialiased font-normal tracking-wide text-slate-100">
+          <h1 className="text-4xl sm:text-6xl subpixel-antialiased font-normal tracking-wide text-slate-100 ">
             Wallet Usage
           </h1>
-          <img src={logo}></img>
+          <img src={logo} className="w-10 sm:w-16"></img>
         </div>
         <div className="flex flex-col-reverse sm:flex-row justify-center space-x-0 sm:space-x-4 pt-11">
           <form className="group relative w-full sm:w-80 sm:pt-0 pt-4">
