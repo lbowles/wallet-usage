@@ -7,8 +7,9 @@ import { configureChains, createClient, WagmiConfig, useAccount } from 'wagmi'
 import { arbitrum, mainnet, polygon } from 'wagmi/chains'
 import { infuraProvider } from 'wagmi/providers/infura'
 import { ethers } from 'ethers'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Chart from './ChartHistory.js'
+import DisplayTransactions from './DisplayTransactions.js'
 
 const chains = [arbitrum, mainnet, polygon]
 
@@ -18,6 +19,7 @@ const { provider } = configureChains(chains, [
     projectId: 'e38c7975262940ae960b8b2a7c841248',
   }),
 ])
+
 const wagmiClient = createClient({
   autoConnect: true,
   connectors: modalConnectors({ appName: 'web3Modal', chains }),
@@ -30,6 +32,7 @@ const ethereumClient = new EthereumClient(wagmiClient, chains)
 
 function App() {
   const { address, isConnecting, isDisconnected } = useAccount()
+  const [selectedMonth, setSelectedMonth] = useState(null)
   let transactions = []
 
   useEffect(() => {
@@ -37,6 +40,10 @@ function App() {
       //getTxHistory()
     }
   }, [isDisconnected, isConnecting])
+
+  const handleMonthUpdate = () => {
+    setSelectedMonth(selectedMonth)
+  }
 
   const getTxHistory = () => {
     etherScanProvider.getHistory(address).then((history) => {
@@ -75,7 +82,8 @@ function App() {
           </form>
           <Web3Button />
         </div>
-        <Chart transactions={transactions}></Chart>
+        <Chart transactions={transactions} />
+        <DisplayTransactions selectedMonth={selectedMonth} />
         <button onClick={() => getTxHistory()}>get history</button>
       </WagmiConfig>
     </div>

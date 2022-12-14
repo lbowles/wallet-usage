@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -8,7 +8,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js'
-import { Bar } from 'react-chartjs-2'
+import { Bar, getElementAtEvent, getDatasetAtEvent } from 'react-chartjs-2'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
@@ -47,9 +47,12 @@ var tempData = {
   ],
 }
 
+let txByMonth = new Map()
+
 export default function ChartHistory({ transactions }) {
   const [data, setData] = useState(tempData)
-  var txByMonth = new Map()
+  // const [selectedMonth, setSelectedMonth] = useState()
+
   var countByMonth = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
   const updateGraphData = () => {
@@ -69,7 +72,6 @@ export default function ChartHistory({ transactions }) {
     for (var [month, events] of txByMonth) {
       countByMonth[month] = Object.keys(events).length
     }
-    console.log(countByMonth)
     updateGraphData()
   }
 
@@ -83,11 +85,6 @@ export default function ChartHistory({ transactions }) {
         return tx
       }
     })
-
-    console.log(startDate)
-    console.log(filteredTransactions)
-    console.log(transactions[0].timestamp)
-
     for (var event of filteredTransactions) {
       var date = new Date(event.timestamp * 1000)
       var month = date.getMonth()
@@ -98,9 +95,26 @@ export default function ChartHistory({ transactions }) {
     }
     for (var [month, events] of txByMonth) {
       var date = new Date(events[0].timestamp * 1000)
-      console.log(`Month: ${month}, Events: ${date}`)
+      //console.log(`Month: ${month}, Events: ${date}`)
     }
+    console.log(txByMonth)
     createDataset()
+  }
+
+  const chartRef = useRef()
+  const onClick = (event) => {
+    getElementAtBar(getElementAtEvent(chartRef.current, event))
+  }
+
+  const getElementAtBar = (element) => {
+    if (!element.length) return
+    const { datasetIndex, index } = element[0]
+    console.log(txByMonth.get(getMonthFromString(data.labels[index])))
+    // handleMonthUpdate(txByMonth.get(getMonthFromString(data.labels[index])))
+  }
+
+  function getMonthFromString(mon) {
+    return new Date(Date.parse(mon + ' 1, 2012')).getMonth()
   }
 
   return (
@@ -113,7 +127,7 @@ export default function ChartHistory({ transactions }) {
           <p className="text-gray-400 text-base mb-4">
             Click a month to see a breakdown of the transactions
           </p>
-          <Bar options={options} data={data} />
+          <Bar options={options} data={data} ref={chartRef} onClick={onClick} />
           <button onClick={() => getChartDate()}>get chart date</button>
         </div>
       </div>
