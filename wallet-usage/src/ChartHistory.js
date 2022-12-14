@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,33 +11,6 @@ import {
 import { Bar } from 'react-chartjs-2'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
-
-export const options = {
-  responsive: true,
-  plugins: {
-    legend: {
-      position: 'top',
-    },
-    title: {
-      display: true,
-      text: 'Chart.js Bar Chart',
-    },
-  },
-}
-const mokData = [
-  { count: 10 },
-  { count: 20 },
-  { count: 15 },
-  { count: 25 },
-  { count: 22 },
-  { count: 30 },
-  { count: 10 },
-  { count: 10 },
-  { count: 20 },
-  { count: 15 },
-  { count: 25 },
-  { count: 25 },
-]
 
 const labels = [
   'Jan',
@@ -54,19 +27,55 @@ const labels = [
   'Dec',
 ]
 
-export const data = {
+const options = {
+  responsive: true,
+  plugins: {
+    legend: {
+      position: 'top',
+    },
+    title: {
+      display: true,
+      text: 'Chart.js Bar Chart',
+    },
+  },
+}
+
+var tempData = {
   labels,
   datasets: [
     {
-      label: 'Dataset 1',
-      data: mokData.map((row) => row.count),
+      label: 'Transactions',
+      data: [23, 3, 0, 0, 0, 0, 5, 0, 0, 20, 0, 0],
       backgroundColor: '#A978C4',
     },
   ],
 }
 
 export default function ChartHistory({ transactions }) {
+  const [data, setData] = useState(tempData)
   var txByMonth = new Map()
+  var countByMonth = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+  const updateGraphData = () => {
+    setData({
+      labels,
+      datasets: [
+        {
+          label: 'Dataset 1',
+          data: countByMonth,
+          backgroundColor: '#A978C4',
+        },
+      ],
+    })
+  }
+
+  const createDataset = () => {
+    for (var [month, events] of txByMonth) {
+      countByMonth[month] = Object.keys(events).length
+    }
+    console.log(countByMonth)
+    updateGraphData()
+  }
 
   const getChartDate = () => {
     const startDate = new Date('2020-01-22')
@@ -83,27 +92,19 @@ export default function ChartHistory({ transactions }) {
     console.log(filteredTransactions)
     console.log(transactions[0].timestamp)
 
-    // Create a new Map to store the events for each month.
-
-    // Loop through the events and add them to the Map.
     for (var event of filteredTransactions) {
-      // Get the month for the event.
       var date = new Date(event.timestamp * 1000)
       var month = date.getMonth()
-      console.log(date + '----' + month)
-      // Check if we have already added an array for this month.
       if (!txByMonth.has(month)) {
         txByMonth.set(month, [])
       }
-
-      // Add the event to the array for this month.
       txByMonth.get(month).push(event)
     }
-
-    // Loop through the Map and print out the events for each month.
     for (var [month, events] of txByMonth) {
-      console.log(`Month: ${month}, Events: ${events}`)
+      var date = new Date(events[0].timestamp * 1000)
+      console.log(`Month: ${month}, Events: ${date}`)
     }
+    createDataset()
   }
 
   return (
