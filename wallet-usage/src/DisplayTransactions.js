@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
 import open from './open.svg'
+import { useProvider } from 'wagmi'
+import { ethers } from 'ethers'
+import { ScaleLoader } from 'react-spinners/ScaleLoader'
 
 const monthNames = [
   'January',
@@ -17,6 +20,9 @@ const monthNames = [
 ]
 
 export default function DisplayTransactions({ selectedMonth }) {
+  const [dynamicSelectedMonth, setDyamicSelectedMonth] = useState(selectedMonth)
+  const [loading, setLoading] = useState(false)
+  const provider = useProvider()
   const [tableRows, setTableRows] = useState()
 
   const getDate = (timestamp) => {
@@ -28,22 +34,46 @@ export default function DisplayTransactions({ selectedMonth }) {
     return monthNames[date.getMonth()] + ' ' + date.getFullYear()
   }
 
-  useEffect(() => {
-    if (selectedMonth) {
-      setTableRows(
-        selectedMonth.map((trans) => (
-          <tr className="bg-white border-b dark:bg-slate-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-            <td className="py-4 px-6">{getDate(trans.timestamp)}</td>
-            <td className="py-4 px-6">{trans.hash.substring(0, 14)}...</td>
-            <td className="py-4 px-6">Laptop</td>
-            <td className="py-4 px-6">
-              <a>
-                <img src={open} style={{ height: '18px' }}></img>
-              </a>
-            </td>
-          </tr>
-        )),
+  const getGasUsed = async (txHash) => {
+    let gasUsed
+    await provider.getTransactionReceipt(txHash).then((receipt) => {
+      gasUsed = Math.round(
+        ethers.utils.formatEther(receipt.gasUsed) * 1000000000000000,
       )
+    })
+    return gasUsed
+  }
+
+  const loadGasUsed = async () => {
+    setLoading(true)
+    for (let i = 0; i < selectedMonth.length; i++) {
+      console.log('kkkkkkkkkk')
+      await getGasUsed(selectedMonth[i].hash).then((gas101) => {
+        console.log('--gas==' + gas101)
+        selectedMonth[i].gasUsed = gas101
+      })
+    }
+    console.log('------' + selectedMonth[0].gasUsed)
+    setTableRows(
+      selectedMonth.map((trans) => (
+        <tr className="bg-white border-b dark:bg-slate-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+          <td className="py-4 px-6">{getDate(trans.timestamp)}</td>
+          <td className="py-4 px-6">{trans.hash.substring(0, 14)}...</td>
+          <td className="py-4 px-6">{trans.gasUsed}</td>
+          <td className="py-4 px-6">
+            <a>
+              <img src={open} style={{ height: '18px' }}></img>
+            </a>
+          </td>
+        </tr>
+      )),
+    )
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    loadGasUsed()
+    if (selectedMonth) {
     }
   }, [selectedMonth])
 
@@ -55,7 +85,6 @@ export default function DisplayTransactions({ selectedMonth }) {
             <h5 className="text-gray-100 text-xl leading-tight font-medium mb-4">
               {getMonth(selectedMonth[0].timestamp)}
             </h5>
-
             <div className="overflow-x-auto relative  sm:rounded-sm max-h-72">
               <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 sticky top-0">
@@ -67,7 +96,7 @@ export default function DisplayTransactions({ selectedMonth }) {
                       Transaction Hash
                     </th>
                     <th scope="col" className="py-3 px-6">
-                      Gass used
+                      Gass Used Gwei
                     </th>
                     <th scope="col" className="py-3 px-6">
                       Link
