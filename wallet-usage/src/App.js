@@ -3,7 +3,13 @@ import './App.css'
 
 import { EthereumClient, modalConnectors } from '@web3modal/ethereum'
 import { Web3Modal, Web3Button } from '@web3modal/react'
-import { configureChains, createClient, WagmiConfig, useAccount } from 'wagmi'
+import {
+  configureChains,
+  createClient,
+  WagmiConfig,
+  useAccount,
+  useNetwork,
+} from 'wagmi'
 import { arbitrum, mainnet, polygon } from 'wagmi/chains'
 import { infuraProvider } from 'wagmi/providers/infura'
 import { ethers } from 'ethers'
@@ -25,19 +31,21 @@ const wagmiClient = createClient({
   connectors: modalConnectors({ appName: 'web3Modal', chains }),
   provider,
 })
+
 let etherScanProvider = new ethers.providers.EtherscanProvider()
 
 // Web3Modal Ethereum Client
 const ethereumClient = new EthereumClient(wagmiClient, chains)
 
 function App() {
+  const { chain } = useNetwork()
   const { address, isConnecting, isDisconnected } = useAccount()
   const [selectedMonth, setSelectedMonth] = useState(null)
   let transactions = []
 
   useEffect(() => {
     if (address) {
-      //getTxHistory()
+      getTxHistory()
     }
   }, [isDisconnected, isConnecting])
 

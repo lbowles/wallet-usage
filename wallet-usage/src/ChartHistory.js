@@ -9,6 +9,7 @@ import {
   Legend,
 } from 'chart.js'
 import { Bar, getElementAtEvent, getDatasetAtEvent } from 'react-chartjs-2'
+import Select from 'react-select'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
@@ -51,7 +52,18 @@ let txByMonth = new Map()
 
 export default function ChartHistory({ transactions, handleMonthUpdate }) {
   const [data, setData] = useState(tempData)
-  // const [selectedMonth, setSelectedMonth] = useState()
+  const startYear = new Date().getFullYear()
+  const initialStartDate = new Date(startYear.toString() + '-01-01')
+  const initialEndDate = new Date(startYear.toString() + '-12-31')
+  const [startDate, setStartDate] = useState(initialStartDate)
+  const [endDate, setEndDate] = useState(initialEndDate)
+  const chartRef = useRef()
+
+  const [selectedYear, setSelectedYear] = useState(2020)
+  const years = Array.from(
+    new Array(100),
+    (val, index) => index + 2010,
+  ).map((year) => ({ value: year, label: year }))
 
   var countByMonth = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
@@ -60,7 +72,7 @@ export default function ChartHistory({ transactions, handleMonthUpdate }) {
       labels,
       datasets: [
         {
-          label: 'Dataset 1',
+          label: 'Transactions',
           data: countByMonth,
           backgroundColor: '#A978C4',
         },
@@ -76,9 +88,6 @@ export default function ChartHistory({ transactions, handleMonthUpdate }) {
   }
 
   const getChartDate = () => {
-    const startDate = new Date('2020-01-22')
-    const endDate = new Date('2022-01-27')
-
     const filteredTransactions = transactions.filter((tx) => {
       var date = new Date(tx.timestamp * 1000)
       if (date >= startDate && date <= endDate) {
@@ -101,7 +110,6 @@ export default function ChartHistory({ transactions, handleMonthUpdate }) {
     createDataset()
   }
 
-  const chartRef = useRef()
   const onClick = (event) => {
     getElementAtBar(getElementAtEvent(chartRef.current, event))
   }
@@ -121,9 +129,19 @@ export default function ChartHistory({ transactions, handleMonthUpdate }) {
     <div>
       <div className="flex justify-center pt-11">
         <div className="block p-6 rounded-lg shadow-lg bg-slate-800 w-full max-w-2xl ">
-          <h5 className="text-gray-100 text-xl leading-tight font-medium mb-2">
-            Transaction Frequency
-          </h5>
+          <div className=" flex justify-between ">
+            <h5 className="text-gray-100 text-xl leading-tight font-medium mb-2 ">
+              Transaction Frequency
+            </h5>
+
+            <Select
+              options={years}
+              value={selectedYear}
+              onChange={(option) => setSelectedYear(option.value)}
+              className="my-react-select-container"
+              classNamePrefix="my-react-select"
+            />
+          </div>
           <p className="text-gray-400 text-base mb-4">
             Click a month to see a breakdown of the transactions
           </p>

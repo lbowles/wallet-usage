@@ -16,7 +16,8 @@
     "react-chartjs-2": "^5.0.1",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
-    "react-spinners": "^0.13.7",
+    "react-select": "^5.7.0",
+    "spinners-react": "^1.0.7",
     "tailwindcss": "^3.2.4",
     "wagmi": "^0.9.2",
     "web-vitals": "^2.1.0"
