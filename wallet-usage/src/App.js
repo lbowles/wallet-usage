@@ -41,7 +41,7 @@ function App() {
   const { chain } = useNetwork()
   const { address, isConnecting, isDisconnected } = useAccount()
   const [selectedMonth, setSelectedMonth] = useState(null)
-  let transactions = []
+  const [transactions, setTransactions] = useState(null)
 
   useEffect(() => {
     if (address) {
@@ -54,12 +54,14 @@ function App() {
   }
 
   const getTxHistory = () => {
+    let tempTransactions = []
     etherScanProvider.getHistory(address).then((history) => {
       history.forEach((txHistory) => {
-        transactions.push(txHistory)
+        tempTransactions.push(txHistory)
         // console.log(txHistory)
       })
     })
+    setTransactions(tempTransactions)
     console.log(transactions)
   }
 

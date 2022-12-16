@@ -22,7 +22,7 @@ code {
   /* .my-react-select-container {
   } */
   .my-react-select-container .my-react-select__control {
-    @apply bg-white dark:bg-slate-700 border-2 border-neutral-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 w-32 justify-self-end;
+    @apply bg-white dark:bg-slate-700 border-2 border-neutral-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 w-28 justify-self-end;
   }
 
   .my-react-select-container .my-react-select__control--is-focused {

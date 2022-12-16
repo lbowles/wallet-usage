@@ -76,8 +76,8 @@ export default function DisplayTransactions({ selectedMonth }) {
   }
 
   useEffect(() => {
-    loadGasUsed()
     if (selectedMonth) {
+      loadGasUsed()
     }
   }, [selectedMonth])
 

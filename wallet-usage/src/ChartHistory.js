@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -55,17 +55,22 @@ export default function ChartHistory({ transactions, handleMonthUpdate }) {
   const startYear = new Date().getFullYear()
   const initialStartDate = new Date(startYear.toString() + '-01-01')
   const initialEndDate = new Date(startYear.toString() + '-12-31')
-  const [startDate, setStartDate] = useState(initialStartDate)
-  const [endDate, setEndDate] = useState(initialEndDate)
+  let startDate = initialStartDate
+  let endDate = initialEndDate
   const chartRef = useRef()
+  const years = []
 
-  const [selectedYear, setSelectedYear] = useState(2020)
-  const years = Array.from(
-    new Array(100),
-    (val, index) => index + 2010,
-  ).map((year) => ({ value: year, label: year }))
+  for (let year = 2010; year <= startYear; year++) {
+    years.push({ value: year, label: year })
+  }
 
   var countByMonth = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+  useEffect(() => {
+    if (transactions) {
+      getChartDate()
+    }
+  }, [transactions])
 
   const updateGraphData = () => {
     setData({
@@ -88,6 +93,8 @@ export default function ChartHistory({ transactions, handleMonthUpdate }) {
   }
 
   const getChartDate = () => {
+    console.log(transactions)
+    txByMonth.clear()
     const filteredTransactions = transactions.filter((tx) => {
       var date = new Date(tx.timestamp * 1000)
       if (date >= startDate && date <= endDate) {
@@ -104,9 +111,7 @@ export default function ChartHistory({ transactions, handleMonthUpdate }) {
     }
     for (var [month, events] of txByMonth) {
       var date = new Date(events[0].timestamp * 1000)
-      //console.log(`Month: ${month}, Events: ${date}`)
     }
-    console.log(txByMonth)
     createDataset()
   }
 
@@ -117,12 +122,20 @@ export default function ChartHistory({ transactions, handleMonthUpdate }) {
   const getElementAtBar = (element) => {
     if (!element.length) return
     const { datasetIndex, index } = element[0]
-    console.log(txByMonth.get(getMonthFromString(data.labels[index])))
     handleMonthUpdate(txByMonth.get(getMonthFromString(data.labels[index])))
   }
 
-  function getMonthFromString(mon) {
+  const getMonthFromString = (mon) => {
     return new Date(Date.parse(mon + ' 1, 2012')).getMonth()
+  }
+
+  const yearSelectedTrigger = (selectedYear) => {
+    const firstDate = new Date(selectedYear + '-01-01')
+    const lastDate = new Date(selectedYear + '-12-31')
+    startDate = firstDate
+    endDate = lastDate
+    getChartDate()
+    handleMonthUpdate(null)
   }
 
   return (
@@ -133,20 +146,18 @@ export default function ChartHistory({ transactions, handleMonthUpdate }) {
             <h5 className="text-gray-100 text-xl leading-tight font-medium mb-2 ">
               Transaction Frequency
             </h5>
-
             <Select
               options={years}
-              value={selectedYear}
-              onChange={(option) => setSelectedYear(option.value)}
+              onChange={(option) => yearSelectedTrigger(option.value)}
               className="my-react-select-container"
               classNamePrefix="my-react-select"
+              placeholder={startYear}
             />
           </div>
           <p className="text-gray-400 text-base mb-4">
             Click a month to see a breakdown of the transactions
           </p>
           <Bar options={options} data={data} ref={chartRef} onClick={onClick} />
-          <button onClick={() => getChartDate()}>get chart date</button>
         </div>
       </div>
     </div>
