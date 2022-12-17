@@ -25,7 +25,6 @@ import axios from 'axios'
 const chains = [mainnet]
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
 const INFURA_PROJECT_ID = process.env.INFURA_PROJECT_ID
-console.log(test)
 
 // Wagmi client
 const { provider } = configureChains(chains, [
