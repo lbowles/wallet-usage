@@ -66,12 +66,6 @@ export default function ChartHistory({ transactions, handleMonthUpdate }) {
 
   var countByMonth = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-  useEffect(() => {
-    if (transactions) {
-      getChartDate()
-    }
-  }, [transactions])
-
   const updateGraphData = () => {
     setData({
       labels,
@@ -93,14 +87,16 @@ export default function ChartHistory({ transactions, handleMonthUpdate }) {
   }
 
   const getChartDate = () => {
-    console.log(transactions)
     txByMonth.clear()
+    console.log(transactions)
     const filteredTransactions = transactions.filter((tx) => {
+      console.log('ss')
       var date = new Date(tx.timestamp * 1000)
       if (date >= startDate && date <= endDate) {
         return tx
       }
     })
+
     for (var event of filteredTransactions) {
       var date = new Date(event.timestamp * 1000)
       var month = date.getMonth()
@@ -137,6 +133,14 @@ export default function ChartHistory({ transactions, handleMonthUpdate }) {
     getChartDate()
     handleMonthUpdate(null)
   }
+
+  useEffect(() => {
+    if (transactions) {
+      console.log('transactions----')
+      console.log(transactions)
+      getChartDate()
+    }
+  }, [transactions])
 
   return (
     <div>

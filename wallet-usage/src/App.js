@@ -13,7 +13,7 @@ import {
 import { arbitrum, mainnet, polygon } from 'wagmi/chains'
 import { infuraProvider } from 'wagmi/providers/infura'
 import { ethers } from 'ethers'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Chart from './ChartHistory.js'
 import DisplayTransactions from './DisplayTransactions.js'
 
@@ -42,6 +42,7 @@ function App() {
   const { address, isConnecting, isDisconnected } = useAccount()
   const [selectedMonth, setSelectedMonth] = useState(null)
   const [transactions, setTransactions] = useState(null)
+  const inputRef = useRef(null)
 
   useEffect(() => {
     if (address) {
@@ -53,16 +54,44 @@ function App() {
     setSelectedMonth(value)
   }
 
-  const getTxHistory = () => {
-    let tempTransactions = []
-    etherScanProvider.getHistory(address).then((history) => {
-      history.forEach((txHistory) => {
-        tempTransactions.push(txHistory)
-        // console.log(txHistory)
-      })
-    })
-    setTransactions(tempTransactions)
+  const getTxHistory = async (searchAddress) => {
+    if (searchAddress) {
+      if (ethers.utils.isAddress(searchAddress)) {
+        let tempTransactions = []
+        await etherScanProvider
+          .getHistory(searchAddress)
+          .then((history) => {
+            history.forEach((txHistory) => {
+              tempTransactions.push(txHistory)
+            })
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+        setTransactions(tempTransactions)
+      } else {
+        console.log('Invalid Address')
+      }
+    } else {
+      if (ethers.utils.isAddress(address)) {
+        let tempTransactions = []
+        etherScanProvider.getHistory(address).then((history) => {
+          history.forEach((txHistory) => {
+            tempTransactions.push(txHistory)
+            // console.log(txHistory)
+          })
+        })
+        setTransactions(tempTransactions)
+      } else {
+        console.log('Invalid Address')
+      }
+    }
     console.log(transactions)
+  }
+
+  const searchWithWallet = (e) => {
+    e.preventDefault()
+    getTxHistory(inputRef.current.value)
   }
 
   return (
@@ -81,13 +110,16 @@ function App() {
           <img src={logo} className="w-10 sm:w-16"></img>
         </div>
         <div className="flex flex-col-reverse sm:flex-row justify-center space-x-0 sm:space-x-4 pt-11">
-          <form className="group relative w-full sm:w-80 sm:pt-0 pt-4">
+          <form
+            className="group relative w-full sm:w-80 sm:pt-0 pt-4"
+            onSubmit={searchWithWallet}
+          >
             <input
               className="bg-slate-800 focus:ring-2 focus:#794DFF focus:outline-none appearance-none w-full text-sm leading-6 text-white placeholder-slate-200 rounded-md py-2 pl-2 ring-1 ring-slate-700 shadow-sm disabled:bg-slate-700"
-              type="text"
               aria-label="Search Address"
               placeholder="Search Address.."
               disabled={!isDisconnected ? 'disabled' : ''}
+              ref={inputRef}
             ></input>
           </form>
           <Web3Button />
