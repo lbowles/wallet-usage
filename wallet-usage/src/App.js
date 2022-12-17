@@ -10,14 +10,17 @@ import {
   useAccount,
   useNetwork,
 } from 'wagmi'
+import { disconnect } from '@wagmi/core'
 import { arbitrum, mainnet, polygon } from 'wagmi/chains'
 import { infuraProvider } from 'wagmi/providers/infura'
 import { ethers } from 'ethers'
 import { useEffect, useState, useRef } from 'react'
 import Chart from './ChartHistory.js'
 import DisplayTransactions from './DisplayTransactions.js'
+import axios from 'axios'
 
 const chains = [arbitrum, mainnet, polygon]
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
 
 // Wagmi client
 const { provider } = configureChains(chains, [
@@ -39,49 +42,56 @@ const ethereumClient = new EthereumClient(wagmiClient, chains)
 
 function App() {
   const { chain } = useNetwork()
-  const { address, isConnecting, isDisconnected } = useAccount()
+  const { address, isConnecting, isDisconnected, isConnected } = useAccount()
   const [selectedMonth, setSelectedMonth] = useState(null)
   const [transactions, setTransactions] = useState(null)
   const inputRef = useRef(null)
 
   useEffect(() => {
-    if (address) {
+    if (isDisconnected) {
+      setTransactions(null)
+    }
+    if (isConnecting) {
+      inputRef.current.value = null
+    }
+    if (address || isConnected) {
+      console.log('call use effect')
       getTxHistory()
     }
-  }, [isDisconnected, isConnecting])
+  }, [isConnected, isDisconnected])
+  //isDisconnected, isConnecting
 
   const handleMonthUpdate = (value) => {
     setSelectedMonth(value)
   }
 
+  const callSetTransactions = async (addr) => {
+    console.log('getAPI')
+    let tempTransactions = []
+    try {
+      const history = await axios.get(
+        `https://api.etherscan.io/api?module=account&action=txlist&address=${addr}&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
+      )
+      console.log(history.data.result)
+      history.data.result.forEach((txHistory) => {
+        tempTransactions.push(txHistory)
+      })
+    } catch (e) {
+      console.log(e)
+    }
+    setTransactions(tempTransactions)
+  }
+
   const getTxHistory = async (searchAddress) => {
     if (searchAddress) {
       if (ethers.utils.isAddress(searchAddress)) {
-        let tempTransactions = []
-        await etherScanProvider
-          .getHistory(searchAddress)
-          .then((history) => {
-            history.forEach((txHistory) => {
-              tempTransactions.push(txHistory)
-            })
-          })
-          .catch((err) => {
-            console.log(err)
-          })
-        setTransactions(tempTransactions)
+        callSetTransactions(searchAddress)
       } else {
         console.log('Invalid Address')
       }
     } else {
       if (ethers.utils.isAddress(address)) {
-        let tempTransactions = []
-        etherScanProvider.getHistory(address).then((history) => {
-          history.forEach((txHistory) => {
-            tempTransactions.push(txHistory)
-            // console.log(txHistory)
-          })
-        })
-        setTransactions(tempTransactions)
+        callSetTransactions(address)
       } else {
         console.log('Invalid Address')
       }
@@ -89,9 +99,11 @@ function App() {
     console.log(transactions)
   }
 
-  const searchWithWallet = (e) => {
+  const searchWithWallet = async (e) => {
+    await disconnect()
     e.preventDefault()
     getTxHistory(inputRef.current.value)
+    inputRef.current.value = null
   }
 
   return (
@@ -118,17 +130,23 @@ function App() {
               className="bg-slate-800 focus:ring-2 focus:#794DFF focus:outline-none appearance-none w-full text-sm leading-6 text-white placeholder-slate-200 rounded-md py-2 pl-2 ring-1 ring-slate-700 shadow-sm disabled:bg-slate-700"
               aria-label="Search Address"
               placeholder="Search Address.."
-              disabled={!isDisconnected ? 'disabled' : ''}
+              // disabled={!isDisconnected ? 'disabled' : ''}
               ref={inputRef}
             ></input>
           </form>
           <Web3Button />
         </div>
-        <Chart
-          transactions={transactions}
-          handleMonthUpdate={handleMonthUpdate}
-        />
-        <DisplayTransactions selectedMonth={selectedMonth} />
+        {transactions && (
+          <>
+            {' '}
+            <Chart
+              transactions={transactions}
+              handleMonthUpdate={handleMonthUpdate}
+            ></Chart>
+            <DisplayTransactions selectedMonth={selectedMonth} />
+          </>
+        )}
+
         <button onClick={() => getTxHistory()}>get history</button>
       </WagmiConfig>
     </div>

@@ -25,12 +25,12 @@ export default function DisplayTransactions({ selectedMonth }) {
   const [tableRows, setTableRows] = useState()
   const [totalGasUsed, setTotalGasUsed] = useState(0)
 
-  const getDate = (timestamp) => {
-    return new Date(timestamp * 1000).toLocaleDateString()
+  const getDate = (timeStamp) => {
+    return new Date(timeStamp * 1000).toLocaleDateString()
   }
 
-  const getMonth = (timestamp) => {
-    const date = new Date(timestamp * 1000)
+  const getMonth = (timeStamp) => {
+    const date = new Date(timeStamp * 1000)
     return monthNames[date.getMonth()] + ' ' + date.getFullYear()
   }
 
@@ -61,7 +61,7 @@ export default function DisplayTransactions({ selectedMonth }) {
     setTableRows(
       selectedMonth.map((trans) => (
         <tr className="bg-white border-b dark:bg-slate-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-          <td className="py-4 px-6">{getDate(trans.timestamp)}</td>
+          <td className="py-4 px-6">{getDate(trans.timeStamp)}</td>
           <td className="py-4 px-6">{trans.hash.substring(0, 14)}...</td>
           <td className="py-4 px-6">{trans.gasUsed}</td>
           <td className="py-4 px-6">
@@ -87,7 +87,7 @@ export default function DisplayTransactions({ selectedMonth }) {
         <div className="flex justify-center pt-4">
           <div className="block p-6 rounded-lg shadow-lg bg-slate-800 w-full max-w-2xl ">
             <h5 className="text-gray-100 text-xl leading-tight font-medium mb-4">
-              {getMonth(selectedMonth[0].timestamp)}
+              {getMonth(selectedMonth[0].timeStamp)}
             </h5>
             <p className="text-gray-400 text-base mb-4">
               {totalGasUsed} Gwei was used for gas this month

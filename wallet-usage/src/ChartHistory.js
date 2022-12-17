@@ -88,17 +88,14 @@ export default function ChartHistory({ transactions, handleMonthUpdate }) {
 
   const getChartDate = () => {
     txByMonth.clear()
-    console.log(transactions)
     const filteredTransactions = transactions.filter((tx) => {
-      console.log('ss')
-      var date = new Date(tx.timestamp * 1000)
+      var date = new Date(tx.timeStamp * 1000)
       if (date >= startDate && date <= endDate) {
         return tx
       }
     })
-
     for (var event of filteredTransactions) {
-      var date = new Date(event.timestamp * 1000)
+      var date = new Date(event.timeStamp * 1000)
       var month = date.getMonth()
       if (!txByMonth.has(month)) {
         txByMonth.set(month, [])
@@ -106,7 +103,7 @@ export default function ChartHistory({ transactions, handleMonthUpdate }) {
       txByMonth.get(month).push(event)
     }
     for (var [month, events] of txByMonth) {
-      var date = new Date(events[0].timestamp * 1000)
+      var date = new Date(events[0].timeStamp * 1000)
     }
     createDataset()
   }
@@ -136,8 +133,6 @@ export default function ChartHistory({ transactions, handleMonthUpdate }) {
 
   useEffect(() => {
     if (transactions) {
-      console.log('transactions----')
-      console.log(transactions)
       getChartDate()
     }
   }, [transactions])
