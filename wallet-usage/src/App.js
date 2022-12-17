@@ -2,6 +2,8 @@ import logo from './logo.svg'
 import './App.css'
 
 import { EthereumClient, modalConnectors } from '@web3modal/ethereum'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import { Web3Modal, Web3Button } from '@web3modal/react'
 import {
   configureChains,
@@ -61,7 +63,6 @@ function App() {
       inputRef.current.value = null
     }
     if (address || isConnected) {
-      console.log('call use effect')
       getTxHistory()
     }
   }, [isConnected, isDisconnected])
@@ -72,18 +73,25 @@ function App() {
   }
 
   const callSetTransactions = async (addr) => {
-    console.log('getAPI')
     let tempTransactions = []
     try {
       const history = await axios.get(
         `https://api.etherscan.io/api?module=account&action=txlist&address=${addr}&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
       )
-      console.log(history.data.result)
       history.data.result.forEach((txHistory) => {
         tempTransactions.push(txHistory)
       })
     } catch (e) {
-      console.log(e)
+      toast('Error', {
+        position: 'top-center',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'dark',
+      })
     }
     setTransactions(tempTransactions)
   }
@@ -93,22 +101,38 @@ function App() {
       if (ethers.utils.isAddress(searchAddress)) {
         callSetTransactions(searchAddress)
       } else {
-        console.log('Invalid Address')
+        toast('Invalid Address', {
+          position: 'top-center',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'dark',
+        })
       }
     } else {
       if (ethers.utils.isAddress(address)) {
         callSetTransactions(address)
       } else {
-        console.log('Invalid Address')
+        toast('Invalid Address', {
+          position: 'top-center',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'dark',
+        })
       }
     }
-    console.log(transactions)
   }
 
   const getAddressFromENS = async (ens) => {
     try {
       var addr = await etherProvider.resolveName(ens)
-      console.log(addr)
       return addr
     } catch (e) {
       return null
@@ -131,6 +155,18 @@ function App() {
 
   return (
     <div className="bg-slate-900 sm:px-0 px-5">
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
       <Web3Modal
         themeColor="purple"
         projectId="e38c7975262940ae960b8b2a7c841248"
@@ -169,8 +205,6 @@ function App() {
             <DisplayTransactions selectedMonth={selectedMonth} />
           </>
         )}
-
-        <button onClick={() => getTxHistory()}>get history</button>
       </WagmiConfig>
     </div>
   )

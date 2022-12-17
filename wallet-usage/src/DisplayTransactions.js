@@ -49,18 +49,18 @@ export default function DisplayTransactions({ selectedMonth }) {
     setTotalGasUsed(0)
     let tempTotalGasUsed = 0
     for (let i = 0; i < selectedMonth.length; i++) {
-      console.log('kkkkkkkkkk')
       await getGasUsed(selectedMonth[i].hash).then((gas101) => {
-        console.log('--gas==' + gas101)
         selectedMonth[i].gasUsed = gas101
         tempTotalGasUsed = gas101 + tempTotalGasUsed
       })
     }
     setTotalGasUsed(tempTotalGasUsed)
-    console.log('------' + totalGasUsed)
     setTableRows(
       selectedMonth.map((trans) => (
-        <tr className="bg-white border-b dark:bg-slate-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+        <tr
+          className="bg-white border-b dark:bg-slate-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+          key={trans.timeStamp}
+        >
           <td className="py-4 px-6">{getDate(trans.timeStamp)}</td>
           <td className="py-4 px-6">{trans.hash.substring(0, 14)}...</td>
           <td className="py-4 px-6">{trans.gasUsed}</td>

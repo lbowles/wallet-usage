@@ -10,6 +10,7 @@ import {
 } from 'chart.js'
 import { Bar, getElementAtEvent, getDatasetAtEvent } from 'react-chartjs-2'
 import Select from 'react-select'
+import { toast } from 'react-toastify'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
@@ -104,6 +105,18 @@ export default function ChartHistory({ transactions, handleMonthUpdate }) {
     }
     for (var [month, events] of txByMonth) {
       var date = new Date(events[0].timeStamp * 1000)
+    }
+    if (txByMonth.size == 0) {
+      toast('No transactions found for this year', {
+        position: 'top-center',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'dark',
+      })
     }
     createDataset()
   }
