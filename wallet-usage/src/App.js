@@ -205,6 +205,15 @@ function App() {
             <DisplayTransactions selectedMonth={selectedMonth} />
           </>
         )}
+        <footer className="fixed bottom-0 w-full py-4  text-center text-gray-700">
+          Made by{' '}
+          <a
+            href="https://twitter.com/npm_luko"
+            className="font-bold text-blue-500 hover:text-blue-800"
+          >
+            @npm_luko
+          </a>
+        </footer>
       </WagmiConfig>
     </div>
   )
