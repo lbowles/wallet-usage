@@ -21,6 +21,7 @@ let etherProvider = new ethers.providers.InfuraProvider(
 function App() {
   const [selectedMonth, setSelectedMonth] = useState(null)
   const [transactions, setTransactions] = useState(null)
+  const [showAddress, setShowAddress] = useState(null)
   const [loading, setLoading] = useState(null)
   const inputRef = useRef(null)
 
@@ -37,6 +38,8 @@ function App() {
       history.data.result.forEach((txHistory) => {
         tempTransactions.push(txHistory)
       })
+      setShowAddress(addr)
+      handleMonthUpdate(null)
     } catch (e) {
       setLoading(false)
       toast('Error', {
@@ -87,12 +90,16 @@ function App() {
     setLoading(true)
     e.preventDefault()
     let addr = await getAddressFromENS(inputRef.current.value)
+    if (addr === null) {
+      setLoading(false)
+    }
     if (addr) {
       inputRef.current.value = null
+      setShowAddress(inputRef.current.value)
       getTxHistory(addr)
     } else {
-      inputRef.current.value = null
       getTxHistory(inputRef.current.value)
+      inputRef.current.value = null
     }
   }
 
@@ -131,6 +138,7 @@ function App() {
         </form>
         {/* <Web3Button /> */}
       </div>
+
       {loading && (
         <div className="flex justify-center pt-11">
           <SpinnerCircular
@@ -141,7 +149,7 @@ function App() {
           />
         </div>
       )}
-      {transactions && (
+      {transactions && !loading && (
         <>
           {' '}
           <Chart
