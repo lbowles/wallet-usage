@@ -24,11 +24,12 @@ import axios from 'axios'
 
 const chains = [mainnet]
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
+const INFURA_PROJECT_ID = process.env.INFURA_PROJECT_ID
 
 // Wagmi client
 const { provider } = configureChains(chains, [
   infuraProvider({
-    projectId: 'e38c7975262940ae960b8b2a7c841248',
+    projectId: INFURA_PROJECT_ID,
   }),
 ])
 
@@ -45,7 +46,7 @@ let etherProvider = new ethers.providers.InfuraProvider(
 
 // Web3Modal Ethereum Client
 const ethereumClient = new ethers.providers.JsonRpcProvider(
-  'https://mainnet.infura.io/v3/e38c7975262940ae960b8b2a7c841248',
+  'https://mainnet.infura.io/v3/' + INFURA_PROJECT_ID,
 )
 
 function App() {
