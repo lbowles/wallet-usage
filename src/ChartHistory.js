@@ -106,7 +106,7 @@ export default function ChartHistory({ transactions, handleMonthUpdate }) {
     for (var [month, events] of txByMonth) {
       var date = new Date(events[0].timeStamp * 1000)
     }
-    if (txByMonth.size == 0) {
+    if (txByMonth.size === 0) {
       toast('No transactions found for this year', {
         position: 'top-center',
         autoClose: 3000,

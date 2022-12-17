@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import open from './open.svg'
-import { useProvider } from 'wagmi'
 import { ethers } from 'ethers'
 import { SpinnerCircular } from 'spinners-react'
 
@@ -21,9 +20,15 @@ const monthNames = [
 
 export default function DisplayTransactions({ selectedMonth }) {
   const [loading, setLoading] = useState(false)
-  const provider = useProvider()
   const [tableRows, setTableRows] = useState()
   const [totalGasUsed, setTotalGasUsed] = useState(0)
+
+  const INFURA_PROJECT_ID = process.env.INFURA_PROJECT_ID
+
+  let etherProvider = new ethers.providers.InfuraProvider(
+    'mainnet',
+    INFURA_PROJECT_ID,
+  )
 
   const getDate = (timeStamp) => {
     return new Date(timeStamp * 1000).toLocaleDateString()
@@ -36,7 +41,7 @@ export default function DisplayTransactions({ selectedMonth }) {
 
   const getGasUsed = async (txHash) => {
     let gasUsed
-    await provider.getTransactionReceipt(txHash).then((receipt) => {
+    await etherProvider.getTransactionReceipt(txHash).then((receipt) => {
       gasUsed = Math.round(
         ethers.utils.formatEther(receipt.gasUsed) * 1000000000000000,
       )
@@ -84,7 +89,7 @@ export default function DisplayTransactions({ selectedMonth }) {
   return (
     <div>
       {selectedMonth && (
-        <div className="flex justify-center pt-4">
+        <div className="flex justify-center pt-4 mb-10">
           <div className="block p-6 rounded-lg shadow-lg bg-slate-800 w-full max-w-2xl ">
             <h5 className="text-gray-100 text-xl leading-tight font-medium mb-4">
               {getMonth(selectedMonth[0].timeStamp)}
