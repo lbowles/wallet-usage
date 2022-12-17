@@ -33,7 +33,7 @@ const options = {
   responsive: true,
   plugins: {
     legend: {
-      position: 'top',
+      display: false,
     },
   },
 }
