@@ -9,6 +9,7 @@ import {
   WagmiConfig,
   useAccount,
   useNetwork,
+  getAddress,
 } from 'wagmi'
 import { disconnect } from '@wagmi/core'
 import { arbitrum, mainnet, polygon } from 'wagmi/chains'
@@ -19,7 +20,7 @@ import Chart from './ChartHistory.js'
 import DisplayTransactions from './DisplayTransactions.js'
 import axios from 'axios'
 
-const chains = [arbitrum, mainnet, polygon]
+const chains = [mainnet]
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
 
 // Wagmi client
@@ -35,10 +36,15 @@ const wagmiClient = createClient({
   provider,
 })
 
-let etherScanProvider = new ethers.providers.EtherscanProvider()
+let etherProvider = new ethers.providers.InfuraProvider(
+  'mainnet',
+  'e38c7975262940ae960b8b2a7c841248',
+)
 
 // Web3Modal Ethereum Client
-const ethereumClient = new EthereumClient(wagmiClient, chains)
+const ethereumClient = new ethers.providers.JsonRpcProvider(
+  'https://mainnet.infura.io/v3/e38c7975262940ae960b8b2a7c841248',
+)
 
 function App() {
   const { chain } = useNetwork()
@@ -99,11 +105,28 @@ function App() {
     console.log(transactions)
   }
 
+  const getAddressFromENS = async (ens) => {
+    try {
+      var addr = await etherProvider.resolveName(ens)
+      console.log(addr)
+      return addr
+    } catch (e) {
+      return null
+    }
+  }
+
   const searchWithWallet = async (e) => {
-    await disconnect()
     e.preventDefault()
-    getTxHistory(inputRef.current.value)
-    inputRef.current.value = null
+    let addr = await getAddressFromENS(inputRef.current.value)
+    if (addr) {
+      await disconnect()
+      inputRef.current.value = null
+      getTxHistory(addr)
+    } else {
+      await disconnect()
+      inputRef.current.value = null
+      getTxHistory(inputRef.current.value)
+    }
   }
 
   return (
@@ -129,7 +152,7 @@ function App() {
             <input
               className="bg-slate-800 focus:ring-2 focus:#794DFF focus:outline-none appearance-none w-full text-sm leading-6 text-white placeholder-slate-200 rounded-md py-2 pl-2 ring-1 ring-slate-700 shadow-sm disabled:bg-slate-700"
               aria-label="Search Address"
-              placeholder="Search Address.."
+              placeholder="Search Address or ENS.."
               // disabled={!isDisconnected ? 'disabled' : ''}
               ref={inputRef}
             ></input>
