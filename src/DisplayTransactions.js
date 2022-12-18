@@ -118,7 +118,7 @@ export default function DisplayTransactions({ selectedMonth }) {
                         Transaction Hash
                       </th>
                       <th scope="col" className="py-3 px-6">
-                        Gass
+                        Gas
                       </th>
                       <th scope="col" className="py-3 px-6">
                         Link
