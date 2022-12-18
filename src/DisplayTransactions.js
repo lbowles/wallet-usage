@@ -39,12 +39,22 @@ export default function DisplayTransactions({ selectedMonth }) {
     return monthNames[date.getMonth()] + ' ' + date.getFullYear()
   }
 
+  const formatNumber = (num) => {
+    var str = num.toString().split('.')
+    if (str[0].length >= 5) {
+      str[0] = str[0].replace(/(\d)(?=(\d{3})+$)/g, '$1,')
+    }
+    if (str[1] && str[1].length >= 5) {
+      str[1] = str[1].replace(/(\d{3})/g, '$1 ')
+    }
+    return str.join('.')
+  }
+
   const getGasUsed = async (txHash) => {
     let gasUsed
     await etherProvider.getTransactionReceipt(txHash).then((receipt) => {
-      gasUsed = Math.round(
-        ethers.utils.formatEther(receipt.gasUsed) * 1000000000000000,
-      )
+      console.log(receipt.gasUsed.toNumber())
+      gasUsed = receipt.gasUsed.toNumber()
     })
     return gasUsed
   }
@@ -59,7 +69,7 @@ export default function DisplayTransactions({ selectedMonth }) {
         tempTotalGasUsed = gas101 + tempTotalGasUsed
       })
     }
-    setTotalGasUsed(tempTotalGasUsed * 1000)
+    setTotalGasUsed(tempTotalGasUsed)
     setTableRows(
       selectedMonth.map((trans) => (
         <tr
@@ -68,7 +78,7 @@ export default function DisplayTransactions({ selectedMonth }) {
         >
           <td className="py-4 px-6">{getDate(trans.timeStamp)}</td>
           <td className="py-4 px-6">{trans.hash.substring(0, 14)}...</td>
-          <td className="py-4 px-6">{trans.gasUsed * 1000}</td>
+          <td className="py-4 px-6">{formatNumber(trans.gasUsed)}</td>
           <td className="py-4 px-6">
             <a href={'https://etherscan.io/tx/' + trans.hash} target="_blank">
               <img src={open} style={{ height: '18px' }}></img>
@@ -95,7 +105,7 @@ export default function DisplayTransactions({ selectedMonth }) {
               {getMonth(selectedMonth[0].timeStamp)}
             </h5>
             <p className="text-gray-400 text-base mb-4">
-              Total {totalGasUsed} gas used for this month
+              Total {formatNumber(totalGasUsed)} gas used for this month
             </p>
             {loading ? (
               <div className="flex justify-center">
