@@ -59,7 +59,7 @@ export default function DisplayTransactions({ selectedMonth }) {
         tempTotalGasUsed = gas101 + tempTotalGasUsed
       })
     }
-    setTotalGasUsed(tempTotalGasUsed)
+    setTotalGasUsed(tempTotalGasUsed * 1000)
     setTableRows(
       selectedMonth.map((trans) => (
         <tr
@@ -68,7 +68,7 @@ export default function DisplayTransactions({ selectedMonth }) {
         >
           <td className="py-4 px-6">{getDate(trans.timeStamp)}</td>
           <td className="py-4 px-6">{trans.hash.substring(0, 14)}...</td>
-          <td className="py-4 px-6">{trans.gasUsed}</td>
+          <td className="py-4 px-6">{trans.gasUsed * 1000}</td>
           <td className="py-4 px-6">
             <a href={'https://etherscan.io/tx/' + trans.hash} target="_blank">
               <img src={open} style={{ height: '18px' }}></img>
