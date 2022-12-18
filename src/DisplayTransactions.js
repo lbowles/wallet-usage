@@ -95,7 +95,7 @@ export default function DisplayTransactions({ selectedMonth }) {
               {getMonth(selectedMonth[0].timeStamp)}
             </h5>
             <p className="text-gray-400 text-base mb-4">
-              {totalGasUsed} Total gas used for this month
+              Total {totalGasUsed} gas used for this month
             </p>
             {loading ? (
               <div className="flex justify-center">
@@ -118,7 +118,7 @@ export default function DisplayTransactions({ selectedMonth }) {
                         Transaction Hash
                       </th>
                       <th scope="col" className="py-3 px-6">
-                        Gass Used
+                        Gass
                       </th>
                       <th scope="col" className="py-3 px-6">
                         Link
